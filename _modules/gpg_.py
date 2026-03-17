@@ -24,11 +24,10 @@ def key_details(text=None, filename=None):
 	gnupghome = __salt__['temp.dir']()
 	urlparsed_filename = urlparse(filename)
 	if urlparsed_filename.scheme:
-		local_file = __salt__['temp.file']()
 		if urlparsed_filename.scheme in ('https', 'http'):
 			file_content = __salt__['http.query'](filename)['body']
-		__salt__['file.write'](local_file, *file_content.splitlines())
-		filename = local_file
+		filename = __salt__['temp.file']()
+		__salt__['file.write'](filename, *file_content.splitlines())
 	__salt__['gpg.import_key'](text=text, filename=filename, gnupghome=gnupghome)
 	result = __salt__['gpg.list_keys'](gnupghome=gnupghome)
 	
